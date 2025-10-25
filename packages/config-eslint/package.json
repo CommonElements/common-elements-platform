@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "main": "index.js",
+  "exports": {
+    "./next.js": "./next.js",
+    "./library.js": "./library.js"
+  },
   "files": [
     "next.js",
     "library.js"
