@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { updateProposal } from '../../../../../actions'
+import { updateProposal } from '../../../actions'
 import { RichTextEditor, Spinner } from '@repo/ui'
 import { DollarSign, Calendar, CreditCard } from 'lucide-react'
 
