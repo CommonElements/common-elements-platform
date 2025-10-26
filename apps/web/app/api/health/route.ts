@@ -3,11 +3,12 @@ import { createServerSupabaseClient } from '@repo/database'
 
 export async function GET() {
   try {
-    // Check database connection
+    // Check database connection - use posts table instead of users to avoid RLS recursion
     const supabase = await createServerSupabaseClient()
-    const { error } = await supabase.from('users').select('id').limit(1).single()
+    const { error } = await supabase.from('posts').select('id').limit(1)
 
-    // It's okay if no users exist, we just want to check the connection
+    // It's okay if no posts exist, we just want to check the connection
+    // PGRST116 = no rows returned (which is fine for health check)
     const isDatabaseHealthy = !error || error.code === 'PGRST116'
 
     if (!isDatabaseHealthy) {

@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "main": "index.js",
+  "scripts": {
+    "build": "echo 'No build needed for TypeScript config'"
+  },
   "files": [
     "base.json",
     "nextjs.json",
