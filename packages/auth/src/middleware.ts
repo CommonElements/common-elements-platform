@@ -69,42 +69,57 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Check if user needs to complete onboarding
+  // TEMPORARILY DISABLED: RLS recursion issue on users table needs to be fixed first
+  // TODO: Fix user_roles RLS policy to avoid infinite recursion
+  /*
   if (user && !isOnboardingRoute && !isAuthRoute) {
-    // Fetch user record to check account type and profile
-    const { data: userRecord } = await supabase
-      .from('users')
-      .select('account_type')
-      .eq('id', user.id)
-      .single()
+    try {
+      // Fetch user record to check account type and profile
+      const { data: userRecord, error } = await supabase
+        .from('users')
+        .select('account_type')
+        .eq('id', user.id)
+        .single()
 
-    if (userRecord) {
-      // Check if profile exists based on account type
-      let hasProfile = false
-
-      if (userRecord.account_type === 'community_member') {
-        const { data: profile } = await supabase
-          .from('community_profiles')
-          .select('id')
-          .eq('user_id', user.id)
-          .single()
-        hasProfile = !!profile
-      } else if (userRecord.account_type === 'vendor') {
-        const { data: profile } = await supabase
-          .from('vendor_profiles')
-          .select('id')
-          .eq('user_id', user.id)
-          .single()
-        hasProfile = !!profile
+      // If we get the RLS recursion error (42P17), skip onboarding check
+      if (error && error.code === '42P17') {
+        console.warn('RLS recursion detected, skipping onboarding check')
+        return supabaseResponse
       }
 
-      // Redirect to onboarding if profile is incomplete
-      if (!hasProfile) {
-        const url = request.nextUrl.clone()
-        url.pathname = '/onboarding'
-        return NextResponse.redirect(url)
+      if (userRecord) {
+        // Check if profile exists based on account type
+        let hasProfile = false
+
+        if (userRecord.account_type === 'community_member') {
+          const { data: profile } = await supabase
+            .from('community_profiles')
+            .select('id')
+            .eq('user_id', user.id)
+            .single()
+          hasProfile = !!profile
+        } else if (userRecord.account_type === 'vendor') {
+          const { data: profile } = await supabase
+            .from('vendor_profiles')
+            .select('id')
+            .eq('user_id', user.id)
+            .single()
+          hasProfile = !!profile
+        }
+
+        // Redirect to onboarding if profile is incomplete
+        if (!hasProfile) {
+          const url = request.nextUrl.clone()
+          url.pathname = '/onboarding'
+          return NextResponse.redirect(url)
+        }
       }
+    } catch (error) {
+      console.error('Error checking onboarding status:', error)
+      // Continue anyway to avoid blocking the request
     }
   }
+  */
 
   return supabaseResponse
 }
