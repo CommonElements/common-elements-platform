@@ -77,31 +77,24 @@ export async function getForumPosts(options: GetForumPostsOptions = {}) {
   const supabase = await createServerSupabaseClient()
 
   // Build query with only necessary columns to reduce data transfer
+  // Note: Table is named 'posts' in production, uses 'created_by' instead of 'author_id'
   let query = supabase
-    .from('forum_posts')
+    .from('posts')
     .select(
       `
       id,
       title,
       content,
-      vote_count,
-      comment_count,
+      upvotes,
+      downvotes,
       view_count,
       created_at,
-      author_id,
+      created_by,
       category_id,
-      author:users!forum_posts_author_id_fkey (
-        id,
-        full_name,
-        avatar_url,
-        account_type
-      ),
-      category:forum_categories!forum_posts_category_id_fkey (
-        id,
-        name,
-        slug,
-        icon
-      )
+      author_role,
+      post_type,
+      is_pinned,
+      is_locked
     `,
       { count: 'exact' }
     )
@@ -119,8 +112,19 @@ export async function getForumPosts(options: GetForumPostsOptions = {}) {
     throw new Error(`Failed to fetch forum posts: ${error.message}`)
   }
 
+  // Transform data to match ForumPost interface
+  // Production schema has different column names
+  const posts = (data || []).map((post: any) => ({
+    ...post,
+    author_id: post.created_by,
+    vote_count: (post.upvotes || 0) - (post.downvotes || 0),
+    comment_count: 0, // Will be populated separately if needed
+    author: null, // Not fetching author details yet due to schema mismatch
+    category: null, // Not fetching category details yet due to schema mismatch
+  }))
+
   return {
-    posts: data as unknown as ForumPost[],
+    posts: posts as unknown as ForumPost[],
     total: count || 0,
   }
 }
@@ -237,14 +241,19 @@ export async function getForumComments(postId: string) {
 export async function getForumCategories() {
   const supabase = await createServerSupabaseClient()
 
-  const { data, error } = await supabase
+  const { data, error} = await supabase
     .from('forum_categories')
-    .select('id, name, slug, description, icon, sort_order')
+    .select('id, name, description, sort_order')
     .order('sort_order', { ascending: true })
 
   if (error) {
     throw new Error(`Failed to fetch forum categories: ${error.message}`)
   }
 
-  return data as ForumCategory[]
+  // Add default values for missing columns
+  return (data || []).map(cat => ({
+    ...cat,
+    slug: cat.name.toLowerCase().replace(/\s+/g, '-'),
+    icon: null,
+  })) as ForumCategory[]
 }

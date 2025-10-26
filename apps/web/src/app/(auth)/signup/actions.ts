@@ -24,12 +24,18 @@ export async function signup(data: SignupInput): Promise<SignupResponse> {
     const supabase = await createServerSupabaseClient()
 
     // Create auth user
+    // Split full name into first and last name for the database trigger
+    const nameParts = validated.fullName.trim().split(' ')
+    const firstName = nameParts[0] || validated.fullName
+    const lastName = nameParts.slice(1).join(' ') || ''
+
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: validated.email,
       password: validated.password,
       options: {
         data: {
-          full_name: validated.fullName,
+          first_name: firstName,
+          last_name: lastName,
         },
       },
     })
