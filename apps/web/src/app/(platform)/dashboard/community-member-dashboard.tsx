@@ -19,7 +19,7 @@ export async function CommunityMemberDashboard({
 }: CommunityMemberDashboardProps) {
   // Fetch active RFPs created by this user
   const allRFPs = await getRFPs({ limit: 100 })
-  const myRFPs = allRFPs.filter(
+  const myRFPs = allRFPs.rfps.filter(
     (rfp) => rfp.creator.user_id === userId && rfp.status === 'open'
   )
 
