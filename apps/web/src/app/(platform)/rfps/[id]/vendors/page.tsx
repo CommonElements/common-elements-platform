@@ -6,6 +6,26 @@ import { VendorApprovalsList } from '../vendor-approvals-list'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
+interface VendorApproval {
+  id: string
+  rfp_id: string
+  status: string
+  requested_at: string
+  vendor: {
+    id: string
+    user_id: string
+    company_name: string
+    service_categories: string[]
+    service_areas: string[]
+    business_description: string | null
+    user: {
+      id: string
+      full_name: string
+      avatar_url: string | null
+    }
+  }
+}
+
 interface VendorManagementPageProps {
   params: Promise<{
     id: string
@@ -95,7 +115,7 @@ export default async function VendorManagementPage({
         <h2 className="text-xl font-semibold text-gray-900 mb-4">
           Pending Requests
         </h2>
-        <VendorApprovalsList approvals={approvals || []} />
+        <VendorApprovalsList approvals={(approvals || []) as unknown as VendorApproval[]} />
       </div>
 
       {/* Approved Vendors Section */}

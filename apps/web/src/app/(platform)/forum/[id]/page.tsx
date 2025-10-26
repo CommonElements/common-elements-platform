@@ -68,10 +68,10 @@ export default async function PostPage({ params }: PostPageProps) {
         .in('votable_id', commentIds)
 
       if (commentVotes) {
-        const voteMap = new Map(
+        const voteMap = new Map<string, 'up' | 'down'>(
           commentVotes.map((v) => [
             v.votable_id,
-            v.direction === 1 ? 'up' : 'down',
+            v.direction === 1 ? ('up' as const) : ('down' as const),
           ])
         )
 

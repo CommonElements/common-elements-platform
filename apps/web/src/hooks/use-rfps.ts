@@ -10,7 +10,7 @@ import { getRFPs, getRFP } from '@repo/database'
 export function useRFPs(filters?: {
   status?: string
   category?: string
-  visibility?: string
+  visibility?: 'public' | 'private'
   limit?: number
   offset?: number
 }) {

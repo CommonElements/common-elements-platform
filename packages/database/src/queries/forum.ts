@@ -49,6 +49,7 @@ export interface ForumComment {
     account_type: string
   }
   replies?: ForumComment[]
+  userVote?: 'up' | 'down' | null
 }
 
 export interface ForumCategory {

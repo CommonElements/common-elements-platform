@@ -66,7 +66,7 @@ export default async function MessagesPage({
         )
       `
       )
-      .eq('rfp_id', params.id)
+      .eq('rfp_id', id)
       .eq('vendor.user_id', recipientId)
       .single()
 
@@ -87,7 +87,7 @@ export default async function MessagesPage({
     const { data: proposal } = await supabase
       .from('proposals')
       .select('id')
-      .eq('rfp_id', params.id)
+      .eq('rfp_id', id)
       .eq('vendor_id', userProfile.profile?.id)
       .single()
 
