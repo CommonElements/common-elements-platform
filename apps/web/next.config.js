@@ -16,6 +16,57 @@ const nextConfig = {
       },
     ],
   },
+
+  // Production optimizations
+  compress: true,
+  poweredByHeader: false,
+
+  // Enable React strict mode for better error detection
+  reactStrictMode: true,
+
+  // Optimize production builds
+  productionBrowserSourceMaps: false,
+
+  // External packages for server components
+  serverExternalPackages: ['@supabase/ssr'],
+
+  // Experimental features for better performance
+  experimental: {
+    // Optimize CSS loading
+    optimizeCss: true,
+  },
+
+  // Headers for additional security and caching
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on'
+          },
+        ],
+      },
+      {
+        // Cache static assets for 1 year
+        source: '/static/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ]
+  },
+
+  // Redirects for common patterns
+  async redirects() {
+    return [
+      // Add any necessary redirects here
+    ]
+  },
 }
 
 module.exports = nextConfig
