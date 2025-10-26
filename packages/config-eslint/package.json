@@ -11,7 +11,7 @@
     "next.js",
     "library.js"
   ],
-  "devDependencies": {
+  "dependencies": {
     "eslint": "^9.18.0",
     "eslint-config-next": "^15.1.6",
     "eslint-config-prettier": "^10.0.1",
