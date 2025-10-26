@@ -54,23 +54,8 @@ export async function signup(data: SignupInput): Promise<SignupResponse> {
       }
     }
 
-    // Create user record in users table
-    const { error: userError } = await supabase.from('users').insert({
-      id: authData.user.id,
-      email: validated.email,
-      full_name: validated.fullName,
-      account_type: 'community_member', // Default, will be updated in onboarding
-    })
-
-    if (userError) {
-      return {
-        success: false,
-        error: {
-          type: 'database',
-          message: 'Failed to create user profile',
-        },
-      }
-    }
+    // User record is automatically created by the on_auth_user_created trigger
+    // No need to manually insert into users table
 
     return { success: true }
   } catch (error) {
