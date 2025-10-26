@@ -6,9 +6,9 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
 interface NewProposalPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function NewProposalPage({
@@ -23,26 +23,28 @@ export default async function NewProposalPage({
     redirect('/rfps')
   }
 
+  const { id } = await params
+
   // Fetch RFP
   let rfp
   try {
-    rfp = await getRFP(params.id)
+    rfp = await getRFP(id)
   } catch (error) {
     notFound()
   }
 
   // Check if RFP is open
   if (rfp.status !== 'open') {
-    redirect(`/rfps/${params.id}`)
+    redirect(`/rfps/${id}`)
   }
 
   // Try to fetch private details (RLS will handle authorization)
-  const privateDetails = await getRFPPrivateDetails(params.id)
+  const privateDetails = await getRFPPrivateDetails(id)
   const hasAccess = privateDetails !== null
 
   // If private RFP and no access, redirect
   if (rfp.visibility === 'private' && !hasAccess) {
-    redirect(`/rfps/${params.id}`)
+    redirect(`/rfps/${id}`)
   }
 
   return (
@@ -50,7 +52,7 @@ export default async function NewProposalPage({
       {/* Header */}
       <div className="mb-8">
         <Link
-          href={`/rfps/${params.id}`}
+          href={`/rfps/${id}`}
           className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
@@ -96,7 +98,7 @@ export default async function NewProposalPage({
 
       {/* Proposal Form */}
       <div className="bg-white rounded-lg shadow p-6">
-        <ProposalForm rfpId={params.id} />
+        <ProposalForm rfpId={id} />
       </div>
     </div>
   )

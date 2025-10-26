@@ -4,12 +4,12 @@ import { requireAuth, getUserProfile } from '@repo/auth'
 import { MessagingInterfaceWrapper } from './messaging-interface-wrapper'
 
 interface MessagesPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
-  searchParams: {
+  }>
+  searchParams: Promise<{
     with?: string // User ID to message with
-  }
+  }>
 }
 
 export default async function MessagesPage({
@@ -24,10 +24,13 @@ export default async function MessagesPage({
     redirect('/login')
   }
 
+  const { id } = await params
+  const { with: withParam } = await searchParams
+
   // Fetch RFP
   let rfp
   try {
-    rfp = await getRFP(params.id)
+    rfp = await getRFP(id)
   } catch (error) {
     notFound()
   }
@@ -38,11 +41,11 @@ export default async function MessagesPage({
 
   if (userProfile.account_type === 'community_member') {
     // Community member messaging with a vendor
-    if (!searchParams.with) {
+    if (!withParam) {
       // Need to specify which vendor to message
-      redirect(`/rfps/${params.id}/proposals`)
+      redirect(`/rfps/${id}/proposals`)
     }
-    recipientId = searchParams.with
+    recipientId = withParam
 
     // Verify the vendor has submitted a proposal
     const supabase = await (
@@ -111,7 +114,7 @@ export default async function MessagesPage({
   }
 
   // Fetch messages
-  const messages = await getRFPMessages(params.id)
+  const messages = await getRFPMessages(id)
 
   // Filter messages between current user and recipient
   const {
@@ -154,7 +157,7 @@ export default async function MessagesPage({
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6">
         <a
-          href={`/rfps/${params.id}`}
+          href={`/rfps/${id}`}
           className="text-sm text-blue-600 hover:text-blue-800"
         >
           ← Back to RFP
@@ -167,7 +170,7 @@ export default async function MessagesPage({
           currentUserId={user.id}
           recipientId={recipientId}
           recipientName={recipientName}
-          rfpId={params.id}
+          rfpId={id}
           rfpTitle={rfp.title}
         />
       </div>

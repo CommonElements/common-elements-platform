@@ -4,13 +4,13 @@ import { createServerSupabaseClient } from '@repo/database/server'
 import { EditPostForm } from './edit-post-form'
 
 interface EditPostPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function EditPostPage({ params }: EditPostPageProps) {
-  const { id } = params
+  const { id } = await params
   const supabase = await createServerSupabaseClient()
 
   // Check authentication

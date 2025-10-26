@@ -6,10 +6,10 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
 interface EditProposalPageProps {
-  params: {
+  params: Promise<{
     id: string
     proposalId: string
-  }
+  }>
 }
 
 export default async function EditProposalPage({
@@ -24,22 +24,24 @@ export default async function EditProposalPage({
     redirect('/rfps')
   }
 
+  const { id, proposalId } = await params
+
   // Fetch proposal
   let proposal
   try {
-    proposal = await getProposal(params.proposalId)
+    proposal = await getProposal(proposalId)
   } catch (error) {
     notFound()
   }
 
   // Check if user owns this proposal
   if (proposal.vendor.user_id !== userProfile.profile?.user_id) {
-    redirect(`/rfps/${params.id}`)
+    redirect(`/rfps/${id}`)
   }
 
   // Check if proposal can be edited
   if (proposal.status !== 'submitted') {
-    redirect(`/rfps/${params.id}`)
+    redirect(`/rfps/${id}`)
   }
 
   return (
@@ -47,7 +49,7 @@ export default async function EditProposalPage({
       {/* Header */}
       <div className="mb-8">
         <Link
-          href={`/rfps/${params.id}`}
+          href={`/rfps/${id}`}
           className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
@@ -70,8 +72,8 @@ export default async function EditProposalPage({
       {/* Edit Form */}
       <div className="bg-white rounded-lg shadow p-6">
         <EditProposalForm
-          proposalId={params.proposalId}
-          rfpId={params.id}
+          proposalId={proposalId}
+          rfpId={id}
           initialData={{
             coverLetter: proposal.cover_letter,
             timeline: proposal.timeline,

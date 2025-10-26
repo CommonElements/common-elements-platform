@@ -7,13 +7,13 @@ import { FileText, DollarSign, Calendar } from 'lucide-react'
 import Link from 'next/link'
 
 interface ProposalsPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function ProposalsPage({ params }: ProposalsPageProps) {
-  const { id } = params
+  const { id } = await params
   const supabase = await createServerSupabaseClient()
 
   // Get current user

@@ -7,9 +7,9 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
 interface VendorManagementPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function VendorManagementPage({
@@ -24,22 +24,24 @@ export default async function VendorManagementPage({
     redirect('/rfps')
   }
 
+  const { id } = await params
+
   // Fetch RFP
   let rfp
   try {
-    rfp = await getRFP(params.id)
+    rfp = await getRFP(id)
   } catch (error) {
     notFound()
   }
 
   // Check if user is the creator
   if (rfp.creator.user_id !== userProfile.profile?.user_id) {
-    redirect(`/rfps/${params.id}`)
+    redirect(`/rfps/${id}`)
   }
 
   // Check if RFP is private
   if (rfp.visibility !== 'private') {
-    redirect(`/rfps/${params.id}`)
+    redirect(`/rfps/${id}`)
   }
 
   // Fetch pending vendor approvals
@@ -67,7 +69,7 @@ export default async function VendorManagementPage({
       )
     `
     )
-    .eq('rfp_id', params.id)
+    .eq('rfp_id', id)
     .eq('status', 'pending')
     .order('requested_at', { ascending: false })
 
@@ -76,7 +78,7 @@ export default async function VendorManagementPage({
       {/* Header */}
       <div className="mb-8">
         <Link
-          href={`/rfps/${params.id}`}
+          href={`/rfps/${id}`}
           className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
@@ -101,7 +103,7 @@ export default async function VendorManagementPage({
         <h2 className="text-xl font-semibold text-gray-900 mb-4">
           Approved Vendors
         </h2>
-        <ApprovedVendorsList rfpId={params.id} />
+        <ApprovedVendorsList rfpId={id} />
       </div>
     </div>
   )

@@ -7,13 +7,13 @@ import { CommentsWrapper } from './comments-wrapper'
 import { MessageSquare, Eye } from 'lucide-react'
 
 interface PostPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function PostPage({ params }: PostPageProps) {
-  const { id } = params
+  const { id } = await params
 
   // Fetch post and increment view count
   let post

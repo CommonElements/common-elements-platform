@@ -16,9 +16,9 @@ import Link from 'next/link'
 import { RequestToBidButton } from './request-to-bid-button'
 
 interface RFPDetailPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function RFPDetailPage({ params }: RFPDetailPageProps) {
@@ -26,16 +26,18 @@ export default async function RFPDetailPage({ params }: RFPDetailPageProps) {
   await requireAuth()
   const userProfile = await getUserProfile()
 
+  const { id } = await params
+
   // Fetch RFP
   let rfp
   try {
-    rfp = await getRFP(params.id)
+    rfp = await getRFP(id)
   } catch (error) {
     notFound()
   }
 
   // Try to fetch private details (RLS will handle authorization)
-  const privateDetails = await getRFPPrivateDetails(params.id)
+  const privateDetails = await getRFPPrivateDetails(id)
   const hasAccess = privateDetails !== null
 
   // Check if user is the creator

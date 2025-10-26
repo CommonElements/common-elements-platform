@@ -6,13 +6,13 @@ import { MapPin, Briefcase, Calendar, FileText, MessageSquare } from 'lucide-rea
 import Link from 'next/link'
 
 interface ProfilePageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
-  const { id } = params
+  const { id } = await params
 
   // Get current user
   const supabase = await createServerSupabaseClient()
