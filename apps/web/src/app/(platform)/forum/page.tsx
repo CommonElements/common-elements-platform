@@ -10,13 +10,15 @@ import { UserBadge } from '@repo/ui'
 import { MessageSquare, ChevronUp } from 'lucide-react'
 
 interface ForumPageProps {
-  searchParams: {
+  searchParams: Promise<{
     category?: string
     page?: string
-  }
+  }>
 }
 
 export default async function ForumPage({ searchParams }: ForumPageProps) {
+  const { category, page } = await searchParams
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
@@ -33,7 +35,7 @@ export default async function ForumPage({ searchParams }: ForumPageProps) {
         {/* Categories Sidebar */}
         <aside className="lg:col-span-1 order-2 lg:order-1">
           <Suspense fallback={<CategoriesSkeleton />}>
-            <CategoriesList selectedCategory={searchParams.category} />
+            <CategoriesList selectedCategory={category} />
           </Suspense>
         </aside>
 
@@ -41,8 +43,8 @@ export default async function ForumPage({ searchParams }: ForumPageProps) {
         <main className="lg:col-span-3 order-1 lg:order-2">
           <Suspense fallback={<PostsSkeleton />}>
             <PostsList
-              categoryId={searchParams.category}
-              page={searchParams.page ? parseInt(searchParams.page) : 1}
+              categoryId={category}
+              page={page ? parseInt(page) : 1}
             />
           </Suspense>
         </main>

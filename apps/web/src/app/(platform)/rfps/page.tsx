@@ -6,14 +6,15 @@ import { UserBadge } from '@repo/ui'
 import { Calendar, FileText, Lock, Plus } from 'lucide-react'
 
 interface RFPsPageProps {
-  searchParams: {
+  searchParams: Promise<{
     status?: string
     category?: string
     page?: string
-  }
+  }>
 }
 
 export default async function RFPsPage({ searchParams }: RFPsPageProps) {
+  const { status, category, page } = await searchParams
   const userProfile = await getUserProfile()
   const isCommunityMember = userProfile?.account_type === 'community_member'
 
@@ -36,8 +37,8 @@ export default async function RFPsPage({ searchParams }: RFPsPageProps) {
         {/* Filters Sidebar */}
         <aside className="lg:col-span-1 order-2 lg:order-1">
           <FiltersSidebar
-            selectedStatus={searchParams.status}
-            selectedCategory={searchParams.category}
+            selectedStatus={status}
+            selectedCategory={category}
           />
         </aside>
 
@@ -45,9 +46,9 @@ export default async function RFPsPage({ searchParams }: RFPsPageProps) {
         <main className="lg:col-span-3 order-1 lg:order-2">
           <Suspense fallback={<RFPsSkeleton />}>
             <RFPsList
-              status={searchParams.status}
-              category={searchParams.category}
-              page={searchParams.page ? parseInt(searchParams.page) : 1}
+              status={status}
+              category={category}
+              page={page ? parseInt(page) : 1}
             />
           </Suspense>
         </main>
