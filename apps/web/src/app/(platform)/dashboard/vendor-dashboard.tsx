@@ -38,7 +38,7 @@ export async function VendorDashboard({
   const approvedRFPIds = new Set(approvedRFPs?.map((a) => a.rfp_id) || [])
 
   // Filter RFPs: public or approved private, and status is open
-  const availableRFPs = allRFPs.filter(
+  const availableRFPs = allRFPs.rfps.filter(
     (rfp) =>
       rfp.status === 'open' &&
       (rfp.visibility === 'public' || approvedRFPIds.has(rfp.id))
